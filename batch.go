@@ -1,6 +1,8 @@
 package eventhub
 
 import (
+	"errors"
+
 	"github.com/Azure/azure-amqp-common-go/v3/uuid"
 	"github.com/Azure/go-amqp"
 )
@@ -119,6 +121,10 @@ func (ebi *EventBatchIterator) Next(eventID string, opts *BatchOptions) (*EventB
 		}
 
 		if !ok {
+			if len(eb.marshaledMessages) == 0 {
+				return eb, errors.New("message is too big")
+			}
+
 			return eb, nil
 		}
 		ebi.Cursors[key]++
